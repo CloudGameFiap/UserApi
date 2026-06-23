@@ -3,12 +3,15 @@ using CloudGame.Application.Extensions;
 using CloudGame.Application.Handlers.UserHandler.Create;
 using CloudGame.Application.Settings;
 using CloudGame.Domain.Commom;
+using CloudGame.Domain.Model;
 using CloudGame.Infrastructure.EntityFramework;
 using CloudGame.Infrastructure.Extensions;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Serilog;
@@ -107,6 +110,26 @@ try
         });
     });
 
+    builder.Services.AddMassTransit(bus =>
+    {
+        bus.UsingRabbitMq((ctx, cfg) =>
+        {
+            cfg.Host("host.docker.internal", "/", h =>
+            {
+                h.Username("guest");
+                h.Password("guest");
+            });
+
+            cfg.Publish<UserCreatedEvent>(p =>
+            {
+                p.ExchangeType = RabbitMQ.Client.ExchangeType.Direct;
+            });
+
+
+        });
+
+    });
+
     var app = builder.Build();
 
     Log.Information("The application has been built, and star the pipeline setup has started.");
@@ -114,7 +137,7 @@ try
     await using (var scope = app.Services.CreateAsyncScope())
     await using (var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>())
     {
-        await appDbContext.Database.EnsureCreatedAsync();
+        await appDbContext.Database.MigrateAsync();
     }    
 
     if (app.Environment.IsDevelopment())
@@ -124,7 +147,7 @@ try
         app.UseSwaggerUI();
     }
 
-    app.UseHttpsRedirection();
+    //app.UseHttpsRedirection();
 
     app.UseAuthorization();
 
