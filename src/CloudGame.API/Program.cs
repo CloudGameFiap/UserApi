@@ -109,6 +109,8 @@ try
 
     var app = builder.Build();
 
+    app.UseSerilogRequestLogging();
+
     Log.Information("The application has been built, and star the pipeline setup has started.");
 
     await using (var scope = app.Services.CreateAsyncScope())
