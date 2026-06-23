@@ -1,0 +1,51 @@
+version: "1.0"
+
+services:
+  rabbitmq:
+    image: masstransit/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - cloudgame-network
+
+  banco:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=CloudGame@123
+    ports:
+      - 1434:1433
+    networks:
+      - cloudgame-network
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "CloudGame@123" -Q "SELECT 1" -No
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  notificationapi:
+    image: danielrsantos/notifiationapi
+    networks:
+      - cloudgame-network
+    depends_on:
+      - rabbitmq
+
+  userapi:
+    image: danielrsantos/usersapi
+    ports:
+      - 5000:8080
+    networks:
+      - cloudgame-network
+    depends_on:
+      banco:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    restart: on-failure
+
+networks:
+  cloudgame-network:
+    driver: bridge

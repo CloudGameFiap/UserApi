@@ -10,6 +10,8 @@
 		<PackageReference Include="FluentValidation" Version="12.1.1" />
 		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+		<PackageReference Include="MassTransit" Version="8.3.6" />
+		<PackageReference Include="MassTransit.RabbitMQ" Version="8.3.6" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.6" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.6">
 			<PrivateAssets>all</PrivateAssets>
@@ -25,6 +27,10 @@
 	<ItemGroup>
 		<ProjectReference Include="..\CloudGame.Application\CloudGame.Application.csproj" />
 		<ProjectReference Include="..\CloudGame.Infrastructure\CloudGame.Infrastructure.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\Dockerfile" />
 	</ItemGroup>
 
 </Project>
