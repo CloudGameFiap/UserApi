@@ -50,6 +50,8 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - cloudgame-network
   
 volumes:
   sql_data:
