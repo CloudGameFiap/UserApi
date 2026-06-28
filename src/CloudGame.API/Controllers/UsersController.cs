@@ -7,9 +7,7 @@ using CloudGame.Application.Handlers.UserHandler.GetById;
 using CloudGame.Application.Handlers.UserHandler.Update;
 using CloudGame.Domain.Commom;
 using CloudGame.Domain.Handlers;
-using CloudGame.Domain.Model;
 using CloudGame.Domain.Parameters;
-using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,13 +17,6 @@ namespace CloudGame.API.Controllers;
 [ApiController]
 public class UsersController : ControllerBase
 {
-    private readonly IPublishEndpoint _publishEndpoint;
-
-    public UsersController(IPublishEndpoint publishEndpoint)
-    {
-        _publishEndpoint = publishEndpoint;
-    }
-
     [HttpPost]
     [AllowAnonymous]
     [ProducesResponseType(typeof(Result<CreateUserCommandResponse>), StatusCodes.Status200OK)]
@@ -37,13 +28,6 @@ public class UsersController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await handler.HandleAsync(command, cancellationToken);
-        await _publishEndpoint.Publish(new UserCreatedEvent
-        {
-            UserId= result.Data.Id,
-            Nome = result.Data.Nome,
-            Email = result.Data.Email
-        });
-        
         return result.ToActionResult();
     }
 

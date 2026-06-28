@@ -20,7 +20,7 @@ public sealed class UserReadOnlyRepository(IDapperContext context)
 
     public async Task<Pagination<User>> FindAsync(FindUsersParameter parameters)
     {
-        var sqlBuilder = new SqlBuilder();        
+        var sqlBuilder = new SqlBuilder();
 
         if (parameters.Active.HasValue)
             sqlBuilder.Where("Active=@active", new { active = parameters.Active });
@@ -45,7 +45,7 @@ public sealed class UserReadOnlyRepository(IDapperContext context)
     }
 
     public async Task<User?> GetByEmailAsync(string email)
-    {        
+    {
         var parameters = new DynamicParameters();
         parameters.Add("email", email, DbType.String, size: 120);
 
