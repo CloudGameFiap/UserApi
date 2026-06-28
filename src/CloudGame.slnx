@@ -6,4 +6,7 @@
   <Project Path="CloudGame.Application/CloudGame.Application.csproj" />
   <Project Path="CloudGame.Domain/CloudGame.Domain.csproj" />
   <Project Path="CloudGame.Infrastructure/CloudGame.Infrastructure.csproj" />
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
 </Solution>
