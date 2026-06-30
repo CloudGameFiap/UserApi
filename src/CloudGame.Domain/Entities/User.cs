@@ -24,7 +24,7 @@ public sealed class User : Entity<int>
 
     public DateTime? UpdateAt { get; private set; }
 
-    public bool IsAdmin { get; private set; }    
+    public bool IsAdmin { get; private set; }
 
     public void SetActive(bool active)
     {

@@ -3,12 +3,15 @@ using CloudGame.Application.Extensions;
 using CloudGame.Application.Handlers.UserHandler.Create;
 using CloudGame.Application.Settings;
 using CloudGame.Domain.Commom;
+using CloudGame.Domain.Events.User;
 using CloudGame.Infrastructure.EntityFramework;
 using CloudGame.Infrastructure.Extensions;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Serilog;
@@ -61,23 +64,23 @@ try
     var encriptKey = jwtSettingsSection.GetValue<string>("EncriptKey")!;
     var key = Encoding.ASCII.GetBytes(encriptKey);
     builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-                .AddJwtBearer(x =>
-                {
-                    x.RequireHttpsMetadata = false;
-                    x.SaveToken = true;
-                    x.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ValidateIssuer = false,
-                        ValidateAudience = false
-                    };
-                });
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(x =>
+        {
+            x.RequireHttpsMetadata = false;
+            x.SaveToken = true;
+            x.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false
+            };
+        });
 
 
     builder.Services.AddExceptionHandler<CloudGameExceptionHandler>();
@@ -107,6 +110,30 @@ try
         });
     });
 
+    builder.Services.AddMassTransit(bus =>
+    {
+        bus.UsingRabbitMq((ctx, cfg) =>
+        {
+            var rabbitMqSection = builder.Configuration.GetRequiredSection("RabbitMQ")!;
+            var host = rabbitMqSection["Host"]!;
+            var username = rabbitMqSection["Username"]!;
+            var password = rabbitMqSection["Password"]!;
+
+            cfg.Host(host, "/", h =>
+            {
+                h.Username(username);
+                h.Password(password);
+            });
+
+            cfg.ConfigureEndpoints(ctx);
+
+            //cfg.Publish<UserCreatedEvent>(p =>
+            //{
+            //    p.ExchangeType = RabbitMQ.Client.ExchangeType.Direct;
+            //});
+        });
+    });
+
     var app = builder.Build();
 
     app.UseSerilogRequestLogging();
@@ -116,8 +143,8 @@ try
     await using (var scope = app.Services.CreateAsyncScope())
     await using (var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>())
     {
-        await appDbContext.Database.EnsureCreatedAsync();
-    }    
+        await appDbContext.Database.MigrateAsync();
+    }
 
     if (app.Environment.IsDevelopment())
     {
@@ -125,8 +152,6 @@ try
         app.UseSwagger();
         app.UseSwaggerUI();
     }
-
-    app.UseHttpsRedirection();
 
     app.UseAuthorization();
 

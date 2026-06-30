@@ -4,7 +4,7 @@
 
 - Daniel - RM372640
 - Domingos Pereira - RM373016
-- Igor Andrade Tudisco - RM371517
+- Igor de Andrade Tudisco - RM371517
 - Guilherme Paschoal - RM373362
 - Pedro Svicero - RM370700
 

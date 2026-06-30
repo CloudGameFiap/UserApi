@@ -1,8 +1,10 @@
 ﻿using CloudGame.Domain.Commom;
 using CloudGame.Domain.Entities;
+using CloudGame.Domain.Events.User;
 using CloudGame.Domain.Handlers;
 using CloudGame.Domain.Interfaces;
 using CloudGame.Domain.Interfaces.Security;
+using MassTransit;
 
 namespace CloudGame.Application.Handlers.UserHandler.Create;
 
@@ -10,6 +12,7 @@ public sealed class CreateUserCommandHandler(
     IUserWriteOnlyRepository userWriteOnlyRepository,
     IPasswordHasher passwordHasher,
     IUserReadOnlyRepository userReadOnlyRepository,
+    IPublishEndpoint publishEndpoint,
     IUnitOfWork unitOfWork) : IHandler<CreateUserCommand, CreateUserCommandResponse>
 {
     public async Task<Result<CreateUserCommandResponse>> HandleAsync(
@@ -30,6 +33,10 @@ public sealed class CreateUserCommandHandler(
         await userWriteOnlyRepository.AddAsync(newUser);
 
         await unitOfWork.SaveChangesAsync();
+
+        var userCreatedEvent = new UserCreatedEvent(newUser.Id, newUser.Name, newUser.Email, newUser.BirthDate, newUser.Active, newUser.CreatedAt, newUser.IsAdmin);
+
+        await publishEndpoint.Publish(userCreatedEvent, cancellationToken);
 
         return Result<CreateUserCommandResponse>.Success(new CreateUserCommandResponse(newUser.Id, newUser.Name, newUser.Email));
     }

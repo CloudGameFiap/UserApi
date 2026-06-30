@@ -24,10 +24,27 @@ namespace CloudGame.Infrastructure.Extensions
                 (
                     configuration.GetConnectionString("Default")
                 )
+                .UseSeeding((context, _) =>
+                {
+                    if (context.Set<User>().Any(s => s.IsAdmin))
+                        return;
+
+                    context.Set<User>().Add(
+                        new User(
+                            configuration["AppDefaultUserAdmin:Name"],
+                            configuration["AppDefaultUserAdmin:Email"],
+                            configuration["AppDefaultUserAdmin:Password"],
+                            DateTime.Today.AddYears(-18),
+                            true
+                        )
+                    );
+
+                    context.SaveChanges();
+                })
                 .UseAsyncSeeding(async (context, _, ct) =>
                 {
                     if (await context.Set<User>().AnyAsync(s => s.IsAdmin, ct))
-                        return;                    
+                        return;
 
                     await context.Set<User>().AddAsync(new User(configuration["AppDefaultUserAdmin:Name"], configuration["AppDefaultUserAdmin:Email"], configuration["AppDefaultUserAdmin:Password"], DateTime.Today.AddYears(-18), true), ct);
                     await context.SaveChangesAsync(ct);
