@@ -34,7 +34,7 @@ public sealed class CreateUserCommandHandler(
 
         await unitOfWork.SaveChangesAsync();
 
-        var userCreatedEvent = new UserCreatedEvent(newUser.Id, newUser.Name, newUser.Email, newUser.BirthDate, newUser.Active, newUser.UpdateAt, newUser.IsAdmin);
+        var userCreatedEvent = new UserCreatedEvent(newUser.Id, newUser.Name, newUser.Email, newUser.BirthDate, newUser.Active, newUser.CreatedAt, newUser.IsAdmin);
 
         await publishEndpoint.Publish(userCreatedEvent, cancellationToken);
 

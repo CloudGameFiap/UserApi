@@ -1,6 +1,7 @@
 services:
   cloudgame.api:
     image: ${DOCKER_REGISTRY-}cloudgameapi
+    container_name: cloudgameapi
     build:
       context: .
       dockerfile: CloudGame.API/Dockerfile

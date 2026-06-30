@@ -125,10 +125,12 @@ try
                 h.Password(password);
             });
 
-            cfg.Publish<UserCreatedEvent>(p =>
-            {
-                p.ExchangeType = RabbitMQ.Client.ExchangeType.Direct;
-            });
+            cfg.ConfigureEndpoints(ctx);
+
+            //cfg.Publish<UserCreatedEvent>(p =>
+            //{
+            //    p.ExchangeType = RabbitMQ.Client.ExchangeType.Direct;
+            //});
         });
     });
 
