@@ -109,6 +109,8 @@ try
 
     var app = builder.Build();
 
+    app.UseSerilogRequestLogging();
+
     Log.Information("The application has been built, and star the pipeline setup has started.");
 
     await using (var scope = app.Services.CreateAsyncScope())
@@ -136,9 +138,13 @@ try
 
     app.Run();
 }
-catch (Exception ex)
+catch (Exception ex) when (ex.GetType().Name != "HostAbortedException")
 {
     Log.Fatal(ex, "Application failed to start");
+}
+catch (Exception)
+{
+    throw;
 }
 finally
 {
