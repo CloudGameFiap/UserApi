@@ -126,6 +126,8 @@ try
 
             cfg.ConfigureEndpoints(ctx);
 
+            //cfg.Message<UserCreatedEvent>(m => m.SetEntityName("UserCreatedEvent"));
+
             //cfg.Publish<UserCreatedEvent>(p =>
             //{
             //    p.ExchangeType = RabbitMQ.Client.ExchangeType.Direct;
