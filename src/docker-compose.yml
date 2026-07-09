@@ -1,5 +1,4 @@
 services:
-
   cloudgame.api:
     image: ${DOCKER_REGISTRY-}cloudgameapi
     container_name: cloudgameapi
@@ -16,14 +15,21 @@ services:
     networks:
       - cloudgame-network
 
-  notificationapi:
-    image: danielrsantos/notifiationapi:4
-    container_name: notificationapi
+
+  cloudgamepaymentapi:
+    image: ${DOCKER_REGISTRY-}cloudgamepaymentapi
+    build:
+      context: ../../PaymentAPI/src
+      dockerfile: Dockerfile
+    ports:
+      - '57398:8080'
+      - '57399:8080'
+    restart: unless-stopped
+    depends_on:
+      sqlserver:
+        condition: service_healthy
     networks:
       - cloudgame-network
-    depends_on:
-      - rabbitmq
-
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -36,9 +42,9 @@ services:
       - sql_data:/var/opt/mssql
     restart: unless-stopped
     ports:
-      - '1433:1433'
+      - '1434:1433'
     expose:
-      - 1433
+      - 1434
     healthcheck:
       test: ['CMD-SHELL', '/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -C -Q "SELECT 1" -b -o /dev/null']
       interval: 10s
@@ -63,6 +69,14 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - cloudgame-network
+
+  notificationapi:
+    image: danielrsantos/notifiationapi:5
+    container_name: notificationapi
+    networks:
+      - cloudgame-network
+    depends_on:
+      - rabbitmq
   
 volumes:
   sql_data:
