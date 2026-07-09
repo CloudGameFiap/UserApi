@@ -25,6 +25,7 @@ public class LoginHandler(
             return Result<LoginResponse>.Failure([new("LoginInvalido", "Login ou senha invalida")]);
 
         Claim[] claims = [
+            new("UserId", user.Id.ToString()),
              new(ClaimTypes.Name, user.Name),
              new(ClaimTypes.Role, user.IsAdmin ? "admin" : "user"),
         ];

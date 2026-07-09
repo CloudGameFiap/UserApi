@@ -3,7 +3,6 @@ using CloudGame.Application.Extensions;
 using CloudGame.Application.Handlers.UserHandler.Create;
 using CloudGame.Application.Settings;
 using CloudGame.Domain.Commom;
-using CloudGame.Domain.Events.User;
 using CloudGame.Infrastructure.EntityFramework;
 using CloudGame.Infrastructure.Extensions;
 using FluentValidation;
