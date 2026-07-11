@@ -15,22 +15,6 @@ services:
     networks:
       - cloudgame-network
 
-
-  cloudgamepaymentapi:
-    image: ${DOCKER_REGISTRY-}cloudgamepaymentapi
-    build:
-      context: ../../PaymentAPI/src
-      dockerfile: Dockerfile
-    ports:
-      - '57398:8080'
-      - '57399:8080'
-    restart: unless-stopped
-    depends_on:
-      sqlserver:
-        condition: service_healthy
-    networks:
-      - cloudgame-network
-
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     hostname: 'sqlserver'

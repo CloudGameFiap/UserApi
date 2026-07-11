@@ -46,6 +46,19 @@ migrations remove (para apagar os arquivos gerados erroneamente).
 migrations add (com a correção).
 
 
+3. Build da Imagem
+
+Acessar a pasta src e executar o seguinte comando
+```Bash
+docker build -f .\CloudGame.API\Dockerfile -t gpaschoal/cloudgamefiapuserapi:1.0 .
+```
+
+Para subir, acessar a pasta src e executar o seguinte comando
+```Bash
+docker push gpaschoal/cloudgamefiapuserapi:1.0
+```
+
+docker push gpaschoal/cloudgameapi:tagname
 
 ## License
 This project is licensed under the MIT License.
