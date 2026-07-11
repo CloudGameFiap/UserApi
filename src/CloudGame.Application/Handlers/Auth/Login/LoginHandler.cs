@@ -26,7 +26,8 @@ public class LoginHandler(
 
         Claim[] claims = [
              new(ClaimTypes.Name, user.Name),
-             new(ClaimTypes.Role, user.IsAdmin ? "admin" : "user"),
+             new("UserId", user.Id.ToString()),
+             new(ClaimTypes.Role, user.IsAdmin ? "admin" : "user")
         ];
 
         JwtSettings jwtSettings = jwtSettingsOption.Value;
