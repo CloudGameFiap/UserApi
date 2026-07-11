@@ -5,66 +5,21 @@ services:
     build:
       context: .
       dockerfile: CloudGame.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__Default=Server=cloudgame-sqlserver,1433;Database=CloudGameUsersDB;User Id=sa;Password=CloudGame#2026;TrustServerCertificate=True;
+      - RabbitMQ__Host=cloudgame-rabbitmq
+      - RabbitMQ__Username=admin
+      - RabbitMQ__Password=admin123
     ports:
       - '7037:8080'
       - '7038:8081'
-    restart: unless-stopped
-    depends_on:
-      sqlserver:
-        condition: service_healthy
+    restart: unless-stopped    
     networks:
-      - cloudgame-network
-
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    hostname: 'sqlserver'
-    container_name: 'sqlserver'
-    environment:
-      ACCEPT_EULA: 'Y'
-      MSSQL_SA_PASSWORD: "CloudGame#2026"
-    volumes:
-      - sql_data:/var/opt/mssql
-    restart: unless-stopped
-    ports:
-      - '1434:1433'
-    expose:
-      - 1434
-    healthcheck:
-      test: ['CMD-SHELL', '/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -C -Q "SELECT 1" -b -o /dev/null']
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
-    networks:
-      - cloudgame-network
-
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    hostname: 'rabbitmq'
-    container_name: rabbitmq
-    restart: unless-stopped
-    ports:
-      - "5672:5672"   # AMQP
-      - "15672:15672" # UI
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    networks:
-      - cloudgame-network
-
-  notificationapi:
-    image: danielrsantos/notifiationapi:5
-    container_name: notificationapi
-    networks:
-      - cloudgame-network
-    depends_on:
-      - rabbitmq
+      - cloudgame-network  
   
-volumes:
-  sql_data:
-  rabbitmq_data:
 networks:
   cloudgame-network:
-    driver: bridge  
+    external: true
+    name: cloudgame-network  
