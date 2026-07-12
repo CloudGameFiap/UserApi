@@ -23,10 +23,19 @@ public class AuthController(ILogger<AuthController> logger) : ControllerBase
         [FromServices] IHandler<LoginCommand, LoginResponse> handler,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation("Login attempt for user {User}", command.User);
-        var loginResult = await handler.HandleAsync(command, cancellationToken);
+        try
+        {
+            logger.LogInformation("Login attempt for user {User}", command.User);
+            var loginResult = await handler.HandleAsync(command, cancellationToken);
 
-        logger.LogInformation("The user {User} has successfully logged in", command.User);
-        return loginResult.ToActionResult();
+            logger.LogInformation("The user {User} has successfully logged in", command.User);
+            return loginResult.ToActionResult();
+        }
+        catch (Exception ex)
+        {
+
+            logger.LogError(ex,"error login");
+            return BadRequest(ex.Message);
+        }       
     }
 }
