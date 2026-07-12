@@ -50,12 +50,12 @@ migrations add (com a correção).
 
 Acessar a pasta src e executar o seguinte comando
 ```Bash
-docker build -f .\CloudGame.API\Dockerfile -t gpaschoal/cloudgamefiapuserapi:1.0 .
+docker build -f .\CloudGame.API\Dockerfile -t dpsnbsb79/cloudgamefiapuserapi:1.0 .
 ```
 
 Para subir, acessar a pasta src e executar o seguinte comando
 ```Bash
-docker push gpaschoal/cloudgamefiapuserapi:1.0
+docker push dpsnbsb79/cloudgamefiapuserapi:1.0
 ```
 
 docker push gpaschoal/cloudgameapi:tagname
