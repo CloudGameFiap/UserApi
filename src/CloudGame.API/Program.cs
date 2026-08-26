@@ -17,6 +17,7 @@ using Microsoft.OpenApi;
 using Serilog;
 using System.Data;
 using System.Text;
+using Prometheus;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -160,6 +161,10 @@ try
     app.MapControllers();
 
     app.MapHealthChecks("/health");
+
+    app.UseHttpMetrics();
+
+    app.MapMetrics("/metrics");
 
     Log.Information("Pipeline successfully configured and application initialized...");
 
