@@ -119,10 +119,14 @@ try
             var username = rabbitMqSection["Username"]!;
             var password = rabbitMqSection["Password"]!;
 
-            cfg.Host(host, "/", h =>
+            cfg.Host(host, 5671, "/", h =>
             {
                 h.Username(username);
                 h.Password(password);
+                h.UseSsl(s =>
+                {
+                    s.Protocol = System.Security.Authentication.SslProtocols.Tls12;
+                });
             });
 
             cfg.ConfigureEndpoints(ctx);
