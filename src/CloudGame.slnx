@@ -2,6 +2,12 @@
   <Folder Name="/CloudGame.Tests/">
     <Project Path="CloudGame.Test/CloudGame.Test.csproj" />
   </Folder>
+  <Folder Name="/k8s/">
+    <File Path="../k8s/configmap.yaml" />
+    <File Path="../k8s/deployment.yaml" />
+    <File Path="../k8s/secret.yaml" />
+    <File Path="../k8s/service.yaml" />
+  </Folder>
   <Project Path="CloudGame.API/CloudGame.API.csproj" />
   <Project Path="CloudGame.Application/CloudGame.Application.csproj" />
   <Project Path="CloudGame.Domain/CloudGame.Domain.csproj" />
