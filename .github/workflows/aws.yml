@@ -19,22 +19,22 @@ env:
 jobs:
   # 1) Build e testes unitarios (roda tambem em Pull Request)
 #  build-test:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v4
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-#      - uses: actions/setup-dotnet@v4
-#        with:
-#          dotnet-version: 8.0.x   # ajuste para a versao do seu projeto
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x   # ajuste para a versao do seu projeto
 
-#      - name: Restore
-#        run: dotnet restore
+      - name: Restore
+        run: dotnet restore
 
-#      - name: Build
-#        run: dotnet build --no-restore -c Release
+      - name: Build
+        run: dotnet build --no-restore -c Release
 
-#      - name: Testes unitários
-#        run: dotnet test --no-build -c Release
+      - name: Testes unitários
+        run: dotnet test --no-build -c Release
 
   # 2) Imagem Docker com tag versionada + scan + push para o ECR (so na main)
   docker-push:
