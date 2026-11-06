@@ -17,7 +17,7 @@ env:
   CONTAINER: user-api       # nome do container dentro do Deployment
 
 jobs:
-  # 1) Build e testes unitarios (roda tambem em Pull Request)
+  # 1) Build e testes unitários (roda também em Pull Request)
   build-test:
     runs-on: ubuntu-latest
     steps:
@@ -25,16 +25,16 @@ jobs:
 
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x   # ajuste para a versao do seu projeto
+          dotnet-version: 8.0.x   # Ajuste conforme a versão do seu SDK (.NET 8 ou 10)
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore ./src/CloudGame.sln
 
       - name: Build
-        run: dotnet build --no-restore -c Release
+        run: dotnet build ./src/CloudGame.sln --no-restore -c Release
 
       - name: Testes unitários
-        run: dotnet test --no-build -c Release
+        run: dotnet test ./src/CloudGame.sln --no-build -c Release
 
   # 2) Imagem Docker com tag versionada + scan + push para o ECR (so na main)
   docker-push:
