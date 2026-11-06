@@ -1,0 +1,104 @@
+name: user-api CI/CD
+
+# Salvar em: .github/workflows/user-api.yml
+# Para o CatalogAPI: copie o arquivo e troque ECR_REPOSITORY, DEPLOYMENT, CONTAINER e o caminho do projeto.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: cloudgame/user-api
+  EKS_CLUSTER: CloudGame-cluster
+  DEPLOYMENT: user-api      # nome do Deployment no Kubernetes
+  CONTAINER: user-api       # nome do container dentro do Deployment
+
+jobs:
+  # 1) Build e testes unitarios (roda tambem em Pull Request)
+#  build-test:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
+
+#      - uses: actions/setup-dotnet@v4
+#        with:
+#          dotnet-version: 8.0.x   # ajuste para a versao do seu projeto
+
+#      - name: Restore
+#        run: dotnet restore
+
+#      - name: Build
+#        run: dotnet build --no-restore -c Release
+
+#      - name: Testes unitários
+#        run: dotnet test --no-build -c Release
+
+  # 2) Imagem Docker com tag versionada + scan + push para o ECR (so na main)
+  docker-push:
+   # needs: build-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login no ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: latest
+        id: meta
+        run: |
+          TAG=${GITHUB_SHA::7}
+          echo "image=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:$TAG" >> "$GITHUB_OUTPUT"
+          echo "latest=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest" >> "$GITHUB_OUTPUT"
+
+      - name: Docker build
+        # Ajuste o -f e o contexto conforme a localizacao do seu Dockerfile
+        run: docker build -f ./src/CloudGameCatalog.Api/Dockerfile -t ${{ steps.meta.outputs.image }} -t ${{ steps.meta.outputs.latest }} .
+
+      - name: Security scan (Trivy) - desejavel
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ steps.meta.outputs.image }}
+          severity: CRITICAL,HIGH
+          exit-code: '0'   # mude para '1' se quiser bloquear o deploy com vulnerabilidades
+
+      - name: Push para o ECR
+        run: |
+          docker push ${{ steps.meta.outputs.image }}
+          docker push ${{ steps.meta.outputs.latest }}
+
+  # 3) Deploy no EKS com Rolling Update
+ # deploy:
+ #   needs: docker-push
+ #   runs-on: ubuntu-latest
+ #   steps:
+ #     - name: Credenciais AWS
+ #       uses: aws-actions/configure-aws-credentials@v4
+ #       with:
+ #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+ #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+ #         aws-region: ${{ env.AWS_REGION }}
+
+ #     - name: Configurar kubectl para o EKS
+ #       run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER }} --region ${{ env.AWS_REGION }}
+
+ #     - name: Atualizar a imagem (dispara o Rolling Update)
+ #       run: |
+ #         kubectl set image deployment/${{ env.DEPLOYMENT }} \
+ #           ${{ env.CONTAINER }}=${{ needs.docker-push.outputs.image }}
+
+ #     - name: Aguardar o rollout terminar
+ #       run: kubectl rollout status deployment/${{ env.DEPLOYMENT }} --timeout=300s
