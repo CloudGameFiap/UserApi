@@ -18,7 +18,7 @@ env:
 
 jobs:
   # 1) Build e testes unitarios (roda tambem em Pull Request)
-#  build-test:
+  build-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
