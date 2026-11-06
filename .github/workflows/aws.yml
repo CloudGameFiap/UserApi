@@ -66,7 +66,7 @@ jobs:
 
       - name: Docker build
         # Ajuste o -f e o contexto conforme a localizacao do seu Dockerfile
-        run: docker build -f ./src/CloudGame.API/Dockerfile -t ${{ steps.meta.outputs.image }} -t ${{ steps.meta.outputs.latest }} .
+        run: docker build -f ./src/CloudGame.API/Dockerfile -t ${{ steps.meta.outputs.image }} -t ${{ steps.meta.outputs.latest }} ./src
 
       - name: Security scan (Trivy) - desejavel
         uses: aquasecurity/trivy-action@v0.36.0
