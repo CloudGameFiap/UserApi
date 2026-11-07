@@ -22,13 +22,13 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./src/CloudGame.API  
+        working-directory: ./src  
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.x 
+          dotnet-version: 10.0.x  
 
       - name: Restore
         run: dotnet restore CloudGame.sln  
