@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: /src  
+        working-directory: ./src  
     steps:
       - uses: actions/checkout@v4
 
@@ -37,7 +37,7 @@ jobs:
    #     run: dotnet build CloudGame.sln --no-restore -c Release
 
       - name: Testes unitários
-        run: dotnet test ./src/CloudGame.Test/CloudGame.sln --no-build -c Release
+        run: dotnet test ./CloudGame.Test/CloudGame.sln --no-build -c Release
 
   # 2) Imagem Docker com tag versionada + scan + push para o ECR (so na main)
   docker-push:
