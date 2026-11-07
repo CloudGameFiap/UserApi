@@ -27,8 +27,8 @@ jobs:
         with:
           dotnet-version: 10.0.x  
 
-      - name: Restore
-        run: dotnet restore "./CloudGame.API.csproj"  
+     # - name: Restore
+     #   run: dotnet restore "./CloudGame.API.csproj"  
 
       - name: Build
         run: dotnet build "./CloudGame.API.csproj" --no-restore -c Release
