@@ -41,7 +41,7 @@ jobs:
 
   # 2) Imagem Docker com tag versionada + scan + push para o ECR (so na main)
   docker-push:
-   # needs: build-test
+    needs: build-test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
