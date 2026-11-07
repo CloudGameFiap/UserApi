@@ -31,10 +31,10 @@ jobs:
      #   run: dotnet restore "./CloudGame.API.csproj"  
 
       - name: Build
-        run: dotnet build "./CloudGame.API.csproj" --no-restore -c Release
+        run: dotnet build "./CloudGame.API/CloudGame.API.csproj" --no-restore -c Release
 
       - name: Testes unitários
-        run: dotnet test "./CloudGame.Test.csproj" --no-build -c Release
+        run: dotnet test "./CloudGame.Test/CloudGame.Test.csproj" --no-build -c Release
 
   # 2) Imagem Docker com tag versionada + scan + push para o ECR (so na main)
   docker-push:
