@@ -33,8 +33,8 @@ jobs:
       - name: Restore
         run: dotnet restore "./CloudGame.API/CloudGame.API.csproj" 
 
-    #  - name: Build
-    #    run: dotnet build "./CloudGame.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+      - name: Build
+        run: dotnet build "./CloudGame.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
     #  - name: Testes unitários
     #    run: dotnet test ./CloudGame.Test/CloudGame.sln --no-build -c Release
