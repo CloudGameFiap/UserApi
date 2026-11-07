@@ -30,14 +30,14 @@ jobs:
         with:
           dotnet-version: 10.0.x  
 
-      - name: Restore
-        run: dotnet restore CloudGame.sln  
+  #    - name: Restore
+  #      run: dotnet restore CloudGame.sln  
 
-      - name: Build
-        run: dotnet build CloudGame.sln --no-restore -c Release
+   #   - name: Build
+   #     run: dotnet build CloudGame.sln --no-restore -c Release
 
       - name: Testes unitários
-        run: dotnet test CloudGame.sln --no-build -c Release
+        run: dotnet test ./src/CloudGame.Test/CloudGame.sln --no-build -c Release
 
   # 2) Imagem Docker com tag versionada + scan + push para o ECR (so na main)
   docker-push:
