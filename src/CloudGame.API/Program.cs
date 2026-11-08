@@ -119,25 +119,22 @@ try
             var host = rabbitMqSection["Host"]!;
             var username = rabbitMqSection["Username"]!;
             var password = rabbitMqSection["Password"]!;
+            var useSsl = rabbitMqSection.GetValue<bool>("UseSsl", true);
+            var port = rabbitMqSection.GetValue<ushort>("Port", 5672);
 
-            cfg.Host(host, 5671, "/", h =>
+            cfg.Host(host, port, "/", h =>
             {
                 h.Username(username);
                 h.Password(password);
-                h.UseSsl(s =>
+
+                if (useSsl)
                 {
-                    s.Protocol = System.Security.Authentication.SslProtocols.Tls12;
-                });
+                    h.UseSsl(s =>
+                    {
+                        s.Protocol = System.Security.Authentication.SslProtocols.Tls12;
+                    });
+                }
             });
-
-            cfg.ConfigureEndpoints(ctx);
-
-            //cfg.Message<UserCreatedEvent>(m => m.SetEntityName("UserCreatedEvent"));
-
-            //cfg.Publish<UserCreatedEvent>(p =>
-            //{
-            //    p.ExchangeType = RabbitMQ.Client.ExchangeType.Direct;
-            //});
         });
     });
 
