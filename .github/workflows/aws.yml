@@ -84,24 +84,24 @@ jobs:
           docker push ${{ steps.meta.outputs.latest }}
 
   # 3) Deploy no EKS com Rolling Update
- # deploy:
- #   needs: docker-push
- #   runs-on: ubuntu-latest
- #   steps:
- #     - name: Credenciais AWS
- #       uses: aws-actions/configure-aws-credentials@v4
- #       with:
- #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
- #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
- #         aws-region: ${{ env.AWS_REGION }}
+  deploy:
+    needs: docker-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
- #     - name: Configurar kubectl para o EKS
- #       run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER }} --region ${{ env.AWS_REGION }}
+      - name: Configurar kubectl para o EKS
+        run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER }} --region ${{ env.AWS_REGION }}
 
- #     - name: Atualizar a imagem (dispara o Rolling Update)
- #       run: |
- #         kubectl set image deployment/${{ env.DEPLOYMENT }} \
- #           ${{ env.CONTAINER }}=${{ needs.docker-push.outputs.image }}
+      - name: Atualizar a imagem (dispara o Rolling Update)
+        run: |
+          kubectl set image deployment/${{ env.DEPLOYMENT }} \
+            ${{ env.CONTAINER }}=${{ needs.docker-push.outputs.image }}
 
  #     - name: Aguardar o rollout terminar
  #       run: kubectl rollout status deployment/${{ env.DEPLOYMENT }} --timeout=300s
