@@ -53,6 +53,7 @@ try
         };
     });
 
+
     builder.Services.AddOpenApi();
 
     builder.Services
