@@ -1,7 +1,7 @@
 name: user-api CI/CD
 
-# Salvar em: .github/workflows/user-api.yml
-# Para o CatalogAPI: copie o arquivo e troque ECR_REPOSITORY, DEPLOYMENT, CONTAINER e o caminho do projeto.
+# Salvar em: .github/workflows/aws.yml
+# Para o CatalogAPI: copie o arquivo e troque ECR_REPOSITORY, DEPLOYMENT, CONTAINER e os caminhos do projeto.
 
 on:
   push:
@@ -17,27 +17,28 @@ env:
   CONTAINER: user-api       # nome do container dentro do Deployment
 
 jobs:
-  # 1) Build e testes unitários (roda também em Pull Request)
+  # 1) Build e testes unitarios (roda tambem em Pull Request)
   build-test:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./src  
+        working-directory: ./src
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.x  
+          dotnet-version: 10.0.x
 
       - name: Restore
-        run: dotnet restore "./CloudGame.API/CloudGame.API.csproj" 
+        run: dotnet restore "./CloudGame.API/CloudGame.API.csproj"
 
       - name: Build
         run: dotnet build "./CloudGame.API/CloudGame.API.csproj" --no-restore -c Release
 
-      - name: Testes unitários
-        run: dotnet test "./CloudGame.Test/CloudGame.Test.csproj" --no-build -c Release
+      # Sem --no-build: o projeto de teste ainda nao foi compilado neste ponto
+      - name: Testes unitarios
+        run: dotnet test "./CloudGame.Test/CloudGame.Test.csproj" -c Release
 
   # 2) Imagem Docker com tag versionada + scan + push para o ECR (so na main)
   docker-push:
@@ -60,7 +61,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: latest
+      - name: Definir nome e tags da imagem
         id: meta
         run: |
           TAG=${GITHUB_SHA::7}
@@ -68,7 +69,6 @@ jobs:
           echo "latest=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest" >> "$GITHUB_OUTPUT"
 
       - name: Docker build
-        # Ajuste o -f e o contexto conforme a localizacao do seu Dockerfile
         run: docker build -f ./src/CloudGame.API/Dockerfile -t ${{ steps.meta.outputs.image }} -t ${{ steps.meta.outputs.latest }} ./src
 
       - name: Security scan (Trivy) - desejavel
@@ -102,5 +102,6 @@ jobs:
         run: |
           kubectl set image deployment/${{ env.DEPLOYMENT }} \
             ${{ env.CONTAINER }}=${{ needs.docker-push.outputs.image }}
-     -name: Aguardar o rollout terminar
-     -run: kubectl rollout status deployment/${{ env.DEPLOYMENT }}
+
+      - name: Aguardar o rollout terminar
+        run: kubectl rollout status deployment/${{ env.DEPLOYMENT }} --timeout=300s
